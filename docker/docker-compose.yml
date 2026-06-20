@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: supplychain_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: supplychain
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: supplychain_zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: supplychain_kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "sales_topic:1:1"
+    ports:
+      - "9092:9092"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,71 @@
+/* Hide default Streamlit stuff */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* App background */
+.stApp {
+    background: linear-gradient(135deg, #0B0F1A 0%, #111827 100%);
+    color: #ffffff;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: #0D1323 !important;
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Sidebar text */
+section[data-testid="stSidebar"] * {
+    color: #E5E7EB !important;
+}
+
+/* Metric cards */
+div[data-testid="metric-container"] {
+    background: rgba(124, 58, 237, 0.18) !important;
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    backdrop-filter: blur(14px);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 8px 30px rgba(124,58,237,0.25);
+    transition: all 0.3s ease;
+}
+
+/* Metric hover */
+div[data-testid="metric-container"]:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(168,85,247,0.4);
+}
+
+/* Main headings */
+h1 {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px;
+}
+
+h2,h3 {
+    color: #E9D5FF !important;
+}
+
+/* Charts */
+[data-testid="stPlotlyChart"] {
+    background: rgba(255,255,255,0.03);
+    border-radius: 20px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Tables */
+[data-testid="stDataFrame"] {
+    background: rgba(255,255,255,0.02);
+    border-radius: 16px;
+    padding: 10px;
+}
+
+/* Main spacing */
+.block-container {
+    padding-top: 2rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
