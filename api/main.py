@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
 import pandas as pd
+from sklearn.linear_model import LinearRegression
+import numpy as np
 
 app = FastAPI()
 
@@ -186,3 +188,126 @@ def low_stock():
     df = pd.read_sql(query, engine)
 
     return df.to_dict(orient="records")
+@app.get("/anomalies")
+def anomalies():
+
+    anomalies_list = []
+
+    # Inventory anomaly
+    inventory_query = """
+    SELECT sku, stock_level
+    FROM inventory
+    WHERE stock_level < 5
+    LIMIT 3
+    """
+
+    inventory_df = pd.read_sql(inventory_query, engine)
+
+    for _, row in inventory_df.iterrows():
+        anomalies_list.append({
+            "type": "Inventory",
+            "message": f"{row['sku']} critically low stock"
+        })
+
+    # Supplier anomaly
+    supplier_query = """
+    SELECT supplier_name, defect_rate
+    FROM suppliers
+    WHERE defect_rate > 4
+    LIMIT 2
+    """
+
+    supplier_df = pd.read_sql(supplier_query, engine)
+
+    for _, row in supplier_df.iterrows():
+        anomalies_list.append({
+            "type": "Supplier",
+            "message": f"{row['supplier_name']} high defect rate"
+        })
+
+    return anomalies_list
+@app.get("/activity-logs")
+def activity_logs():
+
+    logs = []
+
+    # Low stock events
+    stock_query = """
+    SELECT sku, stock_level
+    FROM inventory
+    ORDER BY stock_level ASC
+    LIMIT 3
+    """
+
+    stock_df = pd.read_sql(stock_query, engine)
+
+    for _, row in stock_df.iterrows():
+        logs.append({
+            "message": f"Inventory alert: {row['sku']} stock dropped to {row['stock_level']}"
+        })
+
+    # Supplier quality events
+    supplier_query = """
+    SELECT supplier_name, defect_rate
+    FROM suppliers
+    ORDER BY defect_rate DESC
+    LIMIT 2
+    """
+
+    supplier_df = pd.read_sql(supplier_query, engine)
+
+    for _, row in supplier_df.iterrows():
+        logs.append({
+            "message": f"Supplier update: {row['supplier_name']} defect rate at {round(row['defect_rate'],2)}%"
+        })
+
+    # Logistics events
+    logistics_query = """
+    SELECT transportation_mode, shipping_cost
+    FROM logistics
+    ORDER BY shipping_cost DESC
+    LIMIT 2
+    """
+
+    logistics_df = pd.read_sql(logistics_query, engine)
+
+    for _, row in logistics_df.iterrows():
+        logs.append({
+            "message": f"Logistics update: {row['transportation_mode']} shipping cost ₹{round(row['shipping_cost'] * 95,2)}"
+        })
+
+    return logs
+@app.get("/revenue-forecast")
+def revenue_forecast():
+
+    query = """
+    SELECT revenue_generated
+    FROM sales_fact
+    ORDER BY sale_id
+    """
+
+    df = pd.read_sql(query, engine)
+
+    # historical revenue
+    y = df["revenue_generated"].values
+
+    # create X = [0,1,2...]
+    X = np.array(range(len(y))).reshape(-1, 1)
+
+    # train model
+    model = LinearRegression()
+    model.fit(X, y)
+
+    # predict next 7 future points
+    future_X = np.array(range(len(y), len(y) + 7)).reshape(-1, 1)
+    predictions = model.predict(future_X)
+
+    result = []
+
+    for i, pred in enumerate(predictions):
+        result.append({
+            "day": f"Day {i+1}",
+            "prediction": round(float(pred), 2)
+        })
+
+    return result
