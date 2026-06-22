@@ -16,9 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# PostgreSQL connection
+# PostgreSQL connection (Neon Cloud)
 engine = create_engine(
-    "postgresql://admin:admin123@localhost:5432/supplychain"
+    "postgresql://neondb_owner:npg_dWfz6tks9Yvn@ep-autumn-breeze-athxybzz.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require"
 )
 
 
