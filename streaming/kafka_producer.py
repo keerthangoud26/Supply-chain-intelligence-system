@@ -3,40 +3,44 @@ import json
 import time
 import random
 from datetime import datetime
-from sqlalchemy import create_engine
-import pandas as pd
 
 print("Connecting to Kafka...")
+
 producer = KafkaProducer(
     bootstrap_servers='localhost:9092',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
-print("✅ Connected")
 
-# Load products
-engine = create_engine('postgresql://admin:admin123@localhost:5432/supplychain')
-df = pd.read_sql("SELECT DISTINCT product_name FROM sales_daily", engine)
-products = df['product_name'].tolist()
-print(f"Products: {products}")
+print("Connected")
 
-print("\n📤 Sending sales to Kafka. Press Ctrl+C to stop.\n")
+skus = [f"SKU{i}" for i in range(100)]
+
+print("\nSending sales to Kafka. Press Ctrl+C to stop.\n")
 
 try:
     count = 0
+
     while True:
+        units = random.randint(1, 20)
+        revenue = round(random.uniform(500, 5000), 2)
+
         sale = {
-            'timestamp': datetime.now().isoformat(),
-            'product': random.choice(products),
-            'quantity': random.randint(1, 20),
-            'price': round(random.uniform(10, 200), 2),
-            'location': random.choice(['Mumbai', 'Delhi', 'Bangalore'])
+            "sku": random.choice(skus),
+            "units_sold": units,
+            "revenue_generated": revenue,
+            "created_at": datetime.now().isoformat()
         }
-        
-        producer.send('sales_topic', sale)
+
+        producer.send("sales_topic", sale)
+
         count += 1
-        print(f"[{count}] ✅ {sale['product']} x{sale['quantity']} @ ₹{sale['price']}")
-        time.sleep(2)
-        
+
+        print(
+            f"[{count}] Sent {sale['sku']} | Units={units} | Revenue=₹{revenue}"
+        )
+
+        time.sleep(3)
+
 except KeyboardInterrupt:
-    print(f"\n⏹️ Sent {count} messages. Stopping.")
-    producer.close()    
+    print("\nStopping producer")
+    producer.close()

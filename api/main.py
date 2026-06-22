@@ -167,12 +167,17 @@ def supplier_defects():
 def logistics_cost():
 
     query = """
-    SELECT transportation_mode, AVG(shipping_cost) as avg_cost
+    SELECT transportation_mode, AVG(shipping_cost) AS avg_cost
     FROM logistics
     GROUP BY transportation_mode
     """
 
     df = pd.read_sql(query, engine)
+
+    # USD to INR conversion
+    usd_to_inr = 95
+
+    df["avg_cost"] = df["avg_cost"] * usd_to_inr
 
     return df.to_dict(orient="records")
 @app.get("/low-stock")
