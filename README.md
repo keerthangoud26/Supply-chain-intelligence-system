@@ -172,7 +172,7 @@ Real-Time Business Analytics
 
 ### Clone Repository
 
-git clone your-repository-link
+https://github.com/keerthangoud26/Supply-chain-intelligence-system.git
 
 ### Install Frontend Dependencies
 
