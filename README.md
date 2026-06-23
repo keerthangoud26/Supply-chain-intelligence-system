@@ -208,7 +208,12 @@ python kafka_producer.py
 * Multi-user enterprise access
 * AI-based supply chain optimization recommendations
 * Automated procurement intelligence
+  
+## Live Demo
 
+Frontend: https://supply-chain-frontend-xd8e.onrender.com
+
+Backend API: https://supply-chain-intelligence-system.onrender.com
 ---
 
 ## Author
